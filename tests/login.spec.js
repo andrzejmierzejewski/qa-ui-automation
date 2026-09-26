@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('user can login with valid credentials', async ({ page }) => {
+test('user can log in with valid credentials', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
   await page.locator('[data-test="username"]').fill('standard_user');
   await page.locator('[data-test="password"]').fill('secret_sauce');
@@ -16,6 +16,9 @@ test('shows error for invalid credentials', async ({ page }) => {
   await page.locator('[data-test="login-button"]').click();
 
   await expect(page.locator('[data-test="error"]')).toBeVisible();
+  await expect(page.locator('[data-test="error"]')).toContainText(
+    'Epic sadface: Username and password do not match any user in this service'
+  );
 });
 
 test('shows error for locked-out user', async ({ page }) => {
@@ -25,4 +28,7 @@ test('shows error for locked-out user', async ({ page }) => {
   await page.locator('[data-test="login-button"]').click();
 
   await expect(page.locator('[data-test="error"]')).toBeVisible();
+  await expect(page.locator('[data-test="error"]')).toContainText(
+    'Epic sadface: Sorry, this user has been locked out.'
+  );
 });
