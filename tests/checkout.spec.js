@@ -1,21 +1,17 @@
-import { test, expect } from '@playwright/test';
-const { LoginPage } = require('../pages/LoginPage');
+import { expect } from '@playwright/test';
+const { test } = require('../fixtures/test-fixtures');
 const { InventoryPage } = require('../pages/InventoryPage');
 const { CartPage } = require('../pages/CartPage');
 const { CheckoutPage } = require('../pages/CheckoutPage');
 
-async function loginAndAddItem(page) {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login('standard_user', 'secret_sauce');
-
+async function addItemAndGoToCart(page) {
   const inventoryPage = new InventoryPage(page);
   await inventoryPage.addToCart('sauce-labs-backpack');
   await inventoryPage.goToCart();
 }
 
-test('can complete checkout successfully', async ({ page }) => {
-  await loginAndAddItem(page);
+test('can complete checkout successfully', async ({ loggedInPage: page }) => {
+  await addItemAndGoToCart(page);
   const cartPage = new CartPage(page);
   await cartPage.goToCheckout();
 
@@ -27,8 +23,8 @@ test('can complete checkout successfully', async ({ page }) => {
   await expect(checkoutPage.completeHeader).toHaveText('Thank you for your order!');
 });
 
-test('shows error when first name is missing', async ({ page }) => {
-  await loginAndAddItem(page);
+test('shows error when first name is missing', async ({ loggedInPage: page }) => {
+  await addItemAndGoToCart(page);
   const cartPage = new CartPage(page);
   await cartPage.goToCheckout();
 
@@ -38,8 +34,8 @@ test('shows error when first name is missing', async ({ page }) => {
   await expect(checkoutPage.errorMessage).toHaveText('Error: First Name is required');
 });
 
-test('shows error when last name is missing', async ({ page }) => {
-  await loginAndAddItem(page);
+test('shows error when last name is missing', async ({ loggedInPage: page }) => {
+  await addItemAndGoToCart(page);
   const cartPage = new CartPage(page);
   await cartPage.goToCheckout();
 
@@ -49,8 +45,8 @@ test('shows error when last name is missing', async ({ page }) => {
   await expect(checkoutPage.errorMessage).toHaveText('Error: Last Name is required');
 });
 
-test('shows error when postal code is missing', async ({ page }) => {
-  await loginAndAddItem(page);
+test('shows error when postal code is missing', async ({ loggedInPage: page }) => {
+  await addItemAndGoToCart(page);
   const cartPage = new CartPage(page);
   await cartPage.goToCheckout();
 
@@ -60,8 +56,8 @@ test('shows error when postal code is missing', async ({ page }) => {
   await expect(checkoutPage.errorMessage).toHaveText('Error: Postal Code is required');
 });
 
-test('can cancel checkout and return to cart', async ({ page }) => {
-  await loginAndAddItem(page);
+test('can cancel checkout and return to cart', async ({ loggedInPage: page }) => {
+  await addItemAndGoToCart(page);
   const cartPage = new CartPage(page);
   await cartPage.goToCheckout();
 
